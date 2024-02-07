@@ -108,7 +108,11 @@ module OpenAI
       req_parameters = parameters.dup
 
       if parameters[:stream].respond_to?(:call)
-        req.options.on_data = to_json_stream(user_proc: parameters[:stream])
+        if parameters[:raw_stream]
+          req.options.on_data = parameters[:stream]
+        else
+          req.options.on_data = to_json_stream(user_proc: parameters[:stream])
+        end
         req_parameters[:stream] = true # Necessary to tell OpenAI to stream.
       elsif parameters[:stream]
         raise ArgumentError, "The stream parameter must be a Proc or have a #call method"
